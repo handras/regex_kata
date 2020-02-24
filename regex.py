@@ -1,9 +1,12 @@
 alphabet = ('a', 'b', 'c', 'd')
 
+
 class Empty:
     pass
 
+
 empty = Empty()
+
 
 class regex:
     states = []
@@ -14,7 +17,7 @@ class regex:
         prevstate = 0
         for i in range(len(p)):
             try:
-                n_char = p[i+1]
+                n_char = p[i + 1]
                 if n_char == '*':
                     continue
             except IndexError:
@@ -22,26 +25,26 @@ class regex:
             char = p[i]
 
             if char == '*':
-                multiplied_char = p[i-1]
+                multiplied_char = p[i - 1]
                 if multiplied_char == '.':
                     for a in alphabet:
-                        self.transitions.append((prevstate, a, prevstate+1))
-                        self.transitions.append((prevstate, empty, prevstate+1))
+                        self.transitions.append((prevstate, a, prevstate + 1))
+                        self.transitions.append((prevstate, empty, prevstate + 1))
                         self.transitions.append((prevstate, a, prevstate))
                 else:
                     self.transitions.append((prevstate, multiplied_char, prevstate + 1))
                     self.transitions.append((prevstate, empty, prevstate + 1))
                     self.transitions.append((prevstate, multiplied_char, prevstate))
-                prevstate = prevstate+1
+                prevstate = prevstate + 1
                 pass
             elif char in alphabet:
-                self.transitions.append((prevstate, char, prevstate+1))
-                prevstate = prevstate+1
+                self.transitions.append((prevstate, char, prevstate + 1))
+                prevstate = prevstate + 1
                 pass
             elif char == '.':
                 for a in alphabet:
                     self.transitions.append((prevstate, a, prevstate + 1))
-                prevstate = prevstate+1
+                prevstate = prevstate + 1
                 pass
         self.final = prevstate
         pass
@@ -63,7 +66,6 @@ class regex:
                 if m:
                     return True
         return False
-
 
     def match(self, s, p):
         self.states = []
