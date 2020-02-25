@@ -18,7 +18,7 @@ class regex:
         for i in range(len(p)):
             try:
                 n_char = p[i + 1]
-                if n_char == '*':
+                if n_char in ('*', '?'):
                     continue
             except IndexError:
                 pass
@@ -37,6 +37,17 @@ class regex:
                     self.transitions.append((prevstate, multiplied_char, prevstate))
                 prevstate = prevstate + 1
                 pass
+            elif char == '?':
+                multiplied_char = p[i - 1]
+                if multiplied_char == '.':
+                    for a in alphabet:
+                        self.transitions.append((prevstate, a, prevstate + 1))
+                        self.transitions.append((prevstate, empty, prevstate + 1))
+                else:
+                    self.transitions.append((prevstate, multiplied_char, prevstate + 1))
+                    self.transitions.append((prevstate, empty, prevstate + 1))
+                prevstate = prevstate + 1
+                pass
             elif char in alphabet:
                 self.transitions.append((prevstate, char, prevstate + 1))
                 prevstate = prevstate + 1
@@ -50,22 +61,30 @@ class regex:
         pass
 
     def _match(self, state, string):
+        # if string == '':
+        #     if state == self.final:
+        #         return True
+        #     else:
+        #         return False
+
+        for t in self.transitions:
+            try:
+                if t[0] == state and t[1] == string[0]:
+                    m = self._match(t[2], string[1:])
+                    if m:
+                        return True
+            except IndexError:
+                pass
+            if t[0] == state and t[1] is empty:
+                m = self._match(t[2], string)
+                if m:
+                    return True
+
         if string == '':
             if state == self.final:
                 return True
             else:
                 return False
-
-        for t in self.transitions:
-            if t[0] == state and t[1] == string[0]:
-                m = self._match(t[2], string[1:])
-                if m:
-                    return True
-            if t[0] == state and t[1] is empty:
-                m = self._match(t[2], string)
-                if m:
-                    return True
-        return False
 
     def match(self, s, p):
         self.states = []
